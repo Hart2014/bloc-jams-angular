@@ -13,6 +13,7 @@
   "author": "Bloc Inc",
   "license": "ISC",
   "dependencies": {
+    "angular-ui-router": "^0.3.2",
     "hapi": "~7.5.0",
     "path": "^0.4.9"
   },
