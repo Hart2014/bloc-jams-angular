@@ -1,11 +1,12 @@
 (function() {
-    function SongPlayer(Fixtures) {
+    function SongPlayer($rootScope, Fixtures) {
         var SongPlayer = {};
         
         var currentAlbum = Fixtures.getAlbum();
         /**
         * @desc Buzz Object audio file
         * @type [Object]
+        */
         var currentBuzzObject = null; 
         
         /**
@@ -14,7 +15,6 @@
         * @param {Object} song
         */ 
         var setSong = function(song) {        
-            songPlayer.currentSong = null;
             if (currentBuzzObject) {
                 currentBuzzObject.stop();
                 SongPlayer.currentSong.playing = null;
@@ -28,6 +28,11 @@
         songPlayer.currentSong = song;
     };
         
+        var playSong = function(song) {
+            currentBuzzObject.play();
+            song.playing = true;
+        };
+        
         var getSongIndex = function(song){
             return currentAlbum.songs.indexOf(song);
         };
@@ -35,16 +40,16 @@
         * @desc finds the song index within the album
         * @type function
         */
+        SongPlayer.currentSong = null;
         
         SongPlayer.play = function(song) {     
             song = song || SongPlayer.currentSong;
             if (SongPlayer.currentSong !== song){
                 setSong(song);
-                currentBuzzObject.play();
-                song.playing = true;
+                playSong(song);
             } else if (SongPlayer.currentSong === song){
                 if (currentBuzzObject.isPaused()){
-                    currentBuzzObject.play();
+                    playSong(song);
                 }
             }
         };
