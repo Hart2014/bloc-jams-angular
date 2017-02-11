@@ -14,7 +14,7 @@
         * @desc Stops currently playing song and loads new audio file as currentBuzzObject
         * @param {Object} song
         */ 
-        var setSong = function(song) {        
+        var setSong = function(song) {   
             if (currentBuzzObject) {
                 currentBuzzObject.stop();
                 SongPlayer.currentSong.playing = null;
@@ -23,14 +23,25 @@
             currentBuzzObject = new buzz.sound(song.audioUrl, {
                 formats: ['mp3'],
                 preload: true
+            });      
+            
+            currentBuzzObject.bind('timeupdate', function() {
+                $rootScope.$apply(function() {
+                    SongPlayer.currentTime = currentBuzzObject.getTime();
+                });
             });
  
-        songPlayer.currentSong = song;
-    };
+            SongPlayer.currentSong = song;
+        };
         
         var playSong = function(song) {
             currentBuzzObject.play();
             song.playing = true;
+        };
+        
+        var stopSong = function(song){
+            currentBuzzObject.stop();
+            song.playing = null;
         };
         
         var getSongIndex = function(song){
@@ -40,7 +51,14 @@
         * @desc finds the song index within the album
         * @type function
         */
-        SongPlayer.currentSong = null;
+        SongPlayer.currentSong = null; 
+        SongPlayer.volume = null;
+        
+        /**
+        * @desc Current playback time (in seconds) of currently playing song
+        * @type {Number}
+        */
+        SongPlayer.currentTime = null;
         
         SongPlayer.play = function(song) {     
             song = song || SongPlayer.currentSong;
@@ -54,7 +72,7 @@
             }
         };
         
-        SongPlayer.pause = function(song){     
+        SongPlayer.pause = function(song){
             song = song || SongPlayer.currentSong;
             currentBuzzObject.pause();
             song.playing = false;
@@ -76,14 +94,48 @@
             * @desc if the song is the first song in the index, the previous button will force the playing to stop
             * @type if statement
             */
-        };
+        };        
+        
         /**
-        * @desc finds the current song index and sends it back to the last
-        * @type function
+        * @function next
+        * @desc Set song to next song in album
         */
+        SongPlayer.next = function() {
+            var currentSongIndex = getSongIndex(SongPlayer.currentSong);
+            currentSongIndex++;
+
+            var lastSongIndex = currentAlbum.songs.length - 1;
+
+            if (currentSongIndex > lastSongIndex) {
+                stopSong(SongPlayer.currentSong);
+            } else {
+                var song = currentAlbum.songs[currentSongIndex];
+                setSong(song);
+                playSong(song);
+            }
+        };  
+        
+        /**
+        * @function setCurrentTime
+        * @desc Set current time (in seconds) of currently playing song
+        * @param {Number} time
+        */
+        SongPlayer.setCurrentTime = function(time) {
+            if (currentBuzzObject) {
+                currentBuzzObject.setTime(time);
+            }
+        };
+        
+        SongPlayer.setVolume = function(volume){
+            if (currentBuzzObject){
+                currentBuzzObject.setVolume(volume);
+            }
+            SongPlayer.volume = volume;
+        };
+
         
         return SongPlayer;
-    }
+    };
  
     angular
         .module('blocJams')
