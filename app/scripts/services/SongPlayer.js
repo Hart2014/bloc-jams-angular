@@ -1,14 +1,26 @@
 (function() {
     function SongPlayer($rootScope, Fixtures) {
-        var SongPlayer = {};
         
         var currentAlbum = Fixtures.getAlbum();
+        var SongPlayer = {};
+
         /**
         * @desc Buzz Object audio file
         * @type [Object]
         */
         var currentBuzzObject = null; 
         
+        /**
+        * @desc finds the song index within the album
+        * @type function
+        */
+        var getSongIndex = function(song){
+            return currentAlbum.songs.indexOf(song);
+        };
+        /**
+        * @desc finds the song index within the album
+        * @type function
+        */
         /**
         * @function setSong
         * @desc Stops currently playing song and loads new audio file as currentBuzzObject
@@ -34,23 +46,7 @@
             SongPlayer.currentSong = song;
         };
         
-        var playSong = function(song) {
-            currentBuzzObject.play();
-            song.playing = true;
-        };
         
-        var stopSong = function(song){
-            currentBuzzObject.stop();
-            song.playing = null;
-        };
-        
-        var getSongIndex = function(song){
-            return currentAlbum.songs.indexOf(song);
-        };
-        /**
-        * @desc finds the song index within the album
-        * @type function
-        */
         SongPlayer.currentSong = null; 
         SongPlayer.volume = null;
         
@@ -58,15 +54,50 @@
         * @desc Current playback time (in seconds) of currently playing song
         * @type {Number}
         */
-        SongPlayer.currentTime = null;
+        SongPlayer.currentTime = null;        
         
-        SongPlayer.play = function(song) {     
+        /**
+        * @function setCurrentTime
+        * @desc Set current time (in seconds) of currently playing song
+        * @param {Number} time
+        */
+        SongPlayer.setCurrentTime = function(time) {
+            if (currentBuzzObject) {
+                currentBuzzObject.setTime(time);
+            }
+        };      
+        
+        SongPlayer.volume = 80;
+        
+        SongPlayer.setVolume = function(volume){
+            if (currentBuzzObject){
+                currentBuzzObject.setVolume(volume);
+            }
+            SongPlayer.volume = volume;
+        }
+
+        
+        var playSong = function(song) {
+            currentBuzzObject.play();
+            song.playing = true;
+        }
+        
+        var stopSong = function(song){
+            currentBuzzObject.stop();
+            song.playing = null;
+        }
+
+        SongPlayer.play = function(song) {
             song = song || SongPlayer.currentSong;
             if (SongPlayer.currentSong !== song){
                 setSong(song);
                 playSong(song);
+            } else if (SongPlayer.currentSong === null){
+                song = currentAlbum.songs[0];
+                setSong(song);
+                playSong(song);
             } else if (SongPlayer.currentSong === song){
-                if (currentBuzzObject.pause()){
+                if (currentBuzzObject.isPaused()){
                     playSong(song);
                 }
             }
@@ -83,8 +114,7 @@
             currentSongIndex--;
             
             if (currentSongIndex < 0) {
-                currentBuzzObject.stop();
-                SongPlayer.currentSong.playing = null;
+                stopSong(SongPlayer.currentSong);
             } else {
                 var song = currentAlbum.songs[currentSongIndex];
                 setSong(song);
@@ -114,28 +144,9 @@
                 playSong(song);
             }
         };  
-        
-        /**
-        * @function setCurrentTime
-        * @desc Set current time (in seconds) of currently playing song
-        * @param {Number} time
-        */
-        SongPlayer.setCurrentTime = function(time) {
-            if (currentBuzzObject) {
-                currentBuzzObject.setTime(time);
-            }
-        };
-        
-        SongPlayer.setVolume = function(volume){
-            if (currentBuzzObject){
-                currentBuzzObject.setVolume(volume);
-            }
-            SongPlayer.volume = volume;
-        };
 
-        
         return SongPlayer;
-    };
+    }
  
     angular
         .module('blocJams')

@@ -1,8 +1,6 @@
 (function() {
-    var DEBUG = true;
     
     function config($stateProvider, $locationProvider, $logProvider) {
-        $logProvider.debugEnabled(DEBUG);
         
         $locationProvider
             .html5Mode({

@@ -1,5 +1,5 @@
 (function() {
-    function seekBar($document, $log) { 
+    function seekBar($document) { 
         var calculatePercent = function(seekBar, event) {
             var offsetX = event.pageX - seekBar.offset().left;
             var seekBarWidth = seekBar.width();
@@ -13,12 +13,22 @@
             templateUrl: '/templates/directives/seek_bar.html',
             replace: true,
             restrict: 'E',
-            scope: { },
+            scope: {
+                onChange: '&'
+            },
             link: function(scope, element, attributes){
                 scope.value = 0;
                 scope.max = 100;
                 
                 var seekBar = $(element);
+                
+                attributes.$observe('value', function(newValue){
+                    scope.value = newValue;
+                });
+                
+                attributes.$observe('max', function(newValue){
+                    scope.max = newValue;
+                });
                 
                 var percentString = function(){
                     var value = scope.value;
@@ -32,12 +42,13 @@
                 };
                 
                 scope.thumbStyle = function(){
-                    return {width: percentString()};
-                }
+                    return {left: percentString()};
+                };
                          
                 scope.onClickSeekBar = function(event) {
                     var percent = calculatePercent(seekBar, event);
                     scope.value = percent * scope.max;
+                    notifyOnChange(scope.value);
                 };
 
                 scope.trackThumb = function() {
@@ -48,6 +59,7 @@
                         $log.debug(scope);
                         scope.$apply(function() {
                             scope.value = percent * scope.max;
+                            notifyOnChange(scope.value);
                         });
                     }); 
  
@@ -56,11 +68,17 @@
                         $document.unbind('mouseup.thumb');
                     });
                 };
+                
+                var notifyOnChange = function(newValue){
+                    if (typeof scope.onChage === 'function'){
+                        scope.onChange({value: newValue});
+                        }
+                };
             }
         };
     }
  
     angular
         .module('blocJams')
-        .directive('seekBar', ['$document', '$log', seekBar]);
+        .directive('seekBar', ['$document', seekBar]);
 })();
