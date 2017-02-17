@@ -55,8 +55,6 @@
 
                     $document.bind('mousemove.thumb', function(event) {
                         var percent = calculatePercent(seekBar, event);
-                        $log.debug(percent);
-                        $log.debug(scope);
                         scope.$apply(function() {
                             scope.value = percent * scope.max;
                             notifyOnChange(scope.value);
@@ -72,7 +70,7 @@
                 var notifyOnChange = function(newValue){
                     if (typeof scope.onChage === 'function'){
                         scope.onChange({value: newValue});
-                        }
+                    }
                 };
             }
         };
