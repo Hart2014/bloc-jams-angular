@@ -4,7 +4,7 @@
              <img src="{{ album.albumData.albumArtUrl }}" class="album-cover-art">
          </div>
          <div class="album-view-details column half">
-             <h2 class="album-view-title">T{{ album.albumData.title }}</h2>
+             <h2 class="album-view-title">{{ album.albumData.title }}</h2>
              <h3 class="album-view-artist">{{ album.albumData.artist }}</h3>
              <h5 class="album-view-release-info">{{ album.albumData.year }} {{ album.albumData.label }}</h5>
          </div>
@@ -17,7 +17,7 @@
                 <a class="album-song-button" ng-show="song.playing" ng-click="album.songPlayer.pause(song)"><span class="ion-pause"></span></a>
              </td>
              <td class="song-item-title">{{ song.title }}</td>
-             <td class="song-item-duration">{{ song.duration }}</td>
+             <td class="song-item-duration">{{ song.duration | timecode }}</td>
          </tr>
      </table>
  </main>
